@@ -1,17 +1,10 @@
-<textarea highlight-js [options]="{}" [lang]="'typescript'">
-/* tslint:disable */
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'demo',
-  templateUrl: './demo.component.html',
-  styleUrls: ['./demo.component.scss']
-})
-export class DemoComponent {
-  switchStatus: boolean = true;
-}
-</textarea>
-<textarea highlight-js [options]="{}" [lang]="'html'">
-<!-- demo.component.html -->
-<ngx-code-representation [code]="codeSnippet" [lang]="'typescript'"></ngx-code-representation>
-</textarea>
+<div class="code-container">
+  <button class="copy-button" (click)="copyToClipboard()" [title]="copied() ? 'Copied!' : 'Copy to clipboard'">
+    @if (copied()) {
+      ✓
+    } @else {
+      📋
+    }
+  </button>
+  <pre><code #codeEl [highlightAuto]="code"></code></pre>
+</div>
