@@ -7,9 +7,7 @@ import { file } from '../../../ngx-code-representation/src/lib/models/file.inter
 @Component({
   selector: 'app-root',
   imports: [
-    CodeRepresentationComponent,
-    HighlightAuto,
-    HighlightLineNumbers
+    CodeRepresentationComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.sass'

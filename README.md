@@ -20,44 +20,75 @@ This repository contains an Angular 20 demo that showcases the `ngx-code-represe
 To run this project, you need to have Node.js installed on your machine. Clone the repository and run the following commands:
 
 ```bash
-npm install @christophhu/ngx-datatable
+npm install @christophhu/ngx-code-representation
 ```
 
 ## Usage
 Import the DatatableComponent in the app.ts.
 
 ```typescript
-import { DatatableComponent } from '@christophhu/ngx-datatable';
+import { CodeRepresentationComponent } from '@christophhu/ngx-code-representation';
 
 @NgModule({
     imports: [
-        DatatableComponent,
+        CodeRepresentationComponent,
         ...
     ]
 ...
 })
 ```
 
-Add the table options and data source in your component.ts file.
 ```typescript
-easydata$: Observable<any[]> = of([
-  { date: '01.01.2024 00:00:59', description: 'Berlin', klar: true },
-  { date: '01.01.2023 00:00:59', description: 'Hamburg', klar: false },
-])
-easytable: Tableoptions = {
-  columns: [
-    { id: '1', name: 'date', header: 'Datum/Zeit', cell: 'date', pipe: { name: DatePipe, args: 'dd.MM.yyyy HH:mm:ss'}, hidden: false, sortable: true },
-    { id: '2', name: 'description', header: 'Beschreibung', cell: 'description', hidden: false, sortable: true },
-    { id: '3', name: 'klar', header: 'Klar', cell: 'klar', type: 'checkbox', disabled: true, hidden: false, sortable: true }
+export class App {
+  protected readonly title = signal('demo');
+  
+  testCode = `function hello() {
+  console.log('Hello World');
+  return true;
+}`;
+
+  files: file[] =
+    [
+    {filename: 'main.ts', language: 'typescript', code: `import { provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';`},
+{filename: 'app.ts', language: 'typescript', code: `export interface file {
+  filename: string;
+  language: string;
+  code: string;
+}
+
+export interface files {
+  files: file[];
+}`},
+    {filename: 'highlight-url.ts', language: 'typescript', filepath: `assets/code/highlight-url.ts`},
   ]
 }
 ```
 
-Then, you can use the `<ngx-datatable>` component in your HTML templates as shown below:
+Then, you can use the `<ngx-code-representation>` component in your HTML templates as shown below:
 ```html
-<ngx-datatable [tableoptions]="easytable" [data$]="easydata$"></ngx-datatable>
+<ngx-code-representation [files]="files"></ngx-code-representation>
 ```
 
+```typescript
+import { provideHighlightOptions } from 'ngx-highlightjs'
+import { provideHttpClient } from '@angular/common/http'
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideHighlightOptions({
+      coreLibraryLoader: () => import('highlight.js/lib/core'),
+      languages: {
+        typescript: () => import('highlight.js/lib/languages/typescript'),
+        css: () => import('highlight.js/lib/languages/css'),
+        xml: () => import('highlight.js/lib/languages/xml')
+      },
+      // https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/
+      themePath: 'assets/style/github-dark.css'
+    }),
+    provideHttpClient()
+  ]
+};
+```
 ## License
 This project is licensed under the MIT License.
 
