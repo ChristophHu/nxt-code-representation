@@ -1,6 +1,16 @@
-import { Component, ElementRef, viewChild, signal, effect, ViewChild, AfterViewInit, Input } from '@angular/core';
+import { Component, ElementRef, signal, ViewChild, AfterViewInit, Input, QueryList, ViewChildren } from '@angular/core';
 import { HighlightAuto } from 'ngx-highlightjs'
 import { HighlightLineNumbers } from 'ngx-highlightjs/line-numbers'
+
+export interface file {
+  filename: string;
+  language: string;
+  code: string;
+}
+
+export interface files {
+  files: file[];
+}
 
 @Component({
   selector: 'code-representation',
@@ -13,24 +23,59 @@ import { HighlightLineNumbers } from 'ngx-highlightjs/line-numbers'
 })
 export class CodeRepresentationComponent implements AfterViewInit {
   @ViewChild('codeEl') codeElementRef!: ElementRef<HTMLElement>;
+  @ViewChild('preEl') preElementRef!: ElementRef<HTMLElement>;
   @Input() font_size: string = '16px';
+  @Input() files: file[] = [];
   
   copied = signal(false);
-  
-  code: string = `import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+  activeTabIndex = signal(0);
 
-import { routes } from './app.routes';
-import { provideHighlightOptions } from 'ngx-highlightjs'`;
+  get activeFile(): file {
+    return this.files[this.activeTabIndex()];
+  }
+
+  selectTab(index: number): void {
+    if (index === this.activeTabIndex()) return;
+    
+    // Hide code element and fade out table
+    this.codeElementRef.nativeElement.classList.remove('hljs-line-numbers');
+    const table = this.codeElementRef.nativeElement.querySelector('.hljs-ln') as HTMLElement;
+    if (table) {
+      table.style.opacity = '0';
+    }
+    
+    setTimeout(() => {
+      this.activeTabIndex.set(index);
+      setTimeout(() => {
+        if (this.codeElementRef) {
+          this.addLineNumbersManually(this.codeElementRef.nativeElement);
+          // Fade in new table
+          setTimeout(() => {
+            const newTable = this.codeElementRef.nativeElement.querySelector('.hljs-ln') as HTMLElement;
+            if (newTable) {
+              newTable.style.opacity = '1';
+            }
+          }, 10);
+        }
+      }, 50);
+    }, 150);
+  }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.addLineNumbersManually(this.codeElementRef.nativeElement);
+      if (this.codeElementRef) {
+        this.addLineNumbersManually(this.codeElementRef.nativeElement);
+        // Fade in initial table
+        const table = this.codeElementRef.nativeElement.querySelector('.hljs-ln') as HTMLElement;
+        if (table) {
+          table.style.opacity = '1';
+        }
+      }
     }, 200);
   }
   
   copyToClipboard(): void {
-    navigator.clipboard.writeText(this.code).then(() => {
+    navigator.clipboard.writeText(this.activeFile.code).then(() => {
       this.copied.set(true);
       setTimeout(() => {
         this.copied.set(false);
@@ -44,7 +89,7 @@ import { provideHighlightOptions } from 'ngx-highlightjs'`;
     const highlightedHtml = codeElement.innerHTML;
     const lines = highlightedHtml.split('\n');
     
-    let tableHtml = '<table class="hljs-ln" style="font-size: ' + this.font_size + ';"><tbody>';
+    let tableHtml = '<table class="hljs-ln" style="font-size: ' + this.font_size + '; opacity: 0;"><tbody>';
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
       tableHtml += `<tr><td class="hljs-ln-line hljs-ln-numbers" style="width: 30px; text-align: right; padding-right: 10px; user-select: none;" data-line-number="${lineNumber}"><div class="hljs-ln-n" data-line-number="${lineNumber}">${lineNumber}</div></td><td class="hljs-ln-line hljs-ln-code" data-line-number="${lineNumber}">${line || ' '}</td></tr>`;

@@ -20,4 +20,18 @@ export class App {
   console.log('Hello World');
   return true;
 }`;
+
+  files: { filename: string; language: string; code: string }[] =
+    [
+    {filename: 'main.ts', language: 'typescript', code: `import { provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';`},
+    {filename: 'app.ts', language: 'typescript', code: `export interface file {
+  filename: string;
+  language: string;
+  code: string;
+}
+
+export interface files {
+  files: file[];
+}`}
+  ]
 }

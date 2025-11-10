@@ -1,10 +1,20 @@
 <div class="code-container">
-  <button class="copy-button" (click)="copyToClipboard()" [title]="copied() ? 'Copied!' : 'Copy to clipboard'">
-    @if (copied()) {
-      ✓
-    } @else {
-      📋
+  <div class="tabs-header">
+    @for (file of files; track file.filename; let i = $index) {
+      <button 
+        class="tab-button" 
+        [class.active]="activeTabIndex() === i"
+        (click)="selectTab(i)">
+        {{ file.filename }}
+      </button>
     }
-  </button>
-  <pre><code #codeEl [highlightAuto]="code"></code></pre>
+    <button class="copy-button" (click)="copyToClipboard()" [title]="copied() ? 'Copied!' : 'Copy to clipboard'">
+      @if (copied()) {
+        ✓
+      } @else {
+        📋
+      }
+    </button>
+  </div>
+  <pre #preEl><code #codeEl [highlightAuto]="activeFile.code" [languages]="[activeFile.language]"></code></pre>
 </div>
