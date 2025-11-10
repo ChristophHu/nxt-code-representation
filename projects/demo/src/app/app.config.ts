@@ -2,15 +2,24 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideHighlightJsConfig } from 'ngx-highlight-js';
+import { provideHighlightOptions } from 'ngx-highlightjs'
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHighlightJsConfig({
-      lang: 'html',
-      // theme: 'atom-one-dark',
-      // lineNumbers: true
+    provideHighlightOptions({
+      coreLibraryLoader: () => import('highlight.js/lib/core'),
+      lineNumbersLoader: () => import('ngx-highlightjs/line-numbers'),
+      lineNumbersOptions: {
+        singleLine: true,
+        startFrom: 1
+      },
+      languages: {
+        typescript: () => import('highlight.js/lib/languages/typescript'),
+        css: () => import('highlight.js/lib/languages/css'),
+        xml: () => import('highlight.js/lib/languages/xml')
+      },
+      themePath: 'assets/style/github-dark.css'
     }),
     provideZonelessChangeDetection(),
     provideRouter(routes)
