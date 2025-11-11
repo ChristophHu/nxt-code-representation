@@ -1,49 +1,75 @@
-<div class="code-container">
-  <div class="tabs-header">
-    @if (gist) {
-      <button 
-        class="tab-button" 
-        [class.active]="activeView() === 'preview'"
-        (click)="selectView('preview')">
-        Preview
-      </button>
-    }
-    @for (file of gist?.file; track file.filename; let i = $index) {
-      <button 
-        class="tab-button" 
-        [class.active]="activeTabIndex() === i && activeView() === 'code'"
-        (click)="selectTab(i); selectView('code')">
-        {{ file.filename }}
-      </button>
-    }
+@defer (when gist$) {
+  @if ((gist$ | async); as gist) {
+    <div class="code-container">
+      <div class="tabs-header">
+        @if (gist) {
+          <button 
+            class="tab-button" 
+            [class.active]="activeView() === 1"
+            (click)="selectView(1)">
+            Preview
+          </button>
+        }
 
-    <button class="copy-button" (click)="copyToClipboard()" [title]="copied() ? 'Copied!' : 'Copy to clipboard'">
-      @if (copied()) {
-        <div class="h-6 w-6 text-dark">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /> <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /> <path d="M9 14l2 2l4 -4" /></svg>
-        </div>
-      } @else {
-        <div class="h-6 w-6 text-dark">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /> <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /> <path d="M9 12l.01 0" /> <path d="M13 12l2 0" /> <path d="M9 16l.01 0" /> <path d="M13 16l2 0" /></svg>
-        </div>
+        @if (gist.file && gist.file.length > 0) {
+          @for (file of gist.file; track file.filename; let i = $index) {
+            <button class="tab-button" [class.active]="activeFileIndex() === i && activeView() === 0" (click)="selectFile(i); selectView(0)">
+              {{ file.filename }}
+            </button>
+          }
+        }
+        <!-- <button class="copy-button" (click)="copyToClipboard()" [title]="copied() ? 'Copied!' : 'Copy to clipboard'">
+          @if (copied()) {
+            <div class="h-6 w-6 text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /> <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /> <path d="M9 14l2 2l4 -4" /></svg>
+            </div>
+          } @else {
+            <div class="h-6 w-6 text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /> <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /> <path d="M9 12l.01 0" /> <path d="M13 12l2 0" /> <path d="M9 16l.01 0" /> <path d="M13 16l2 0" /></svg>
+            </div>
+          }
+        </button> -->
+      </div>
+      
+      @if (activeView() === 0) {
+        @if ((file$ | async); as file) {
+          <code-renderer [file]="file"></code-renderer>
+        }
       }
-    </button>
-  </div>
-  
-  @if (activeView() === 'code') {
-    @if (activeFile && activeFile.code) {
-        <pre><code #codeEl [highlightAuto]="activeFile.code" [languages]="[activeFile.language]"></code></pre>
-    }
-    @if (activeFile && activeFile.filepath) {
-      @if (activeFile.filepath | codeFromUrl | async; as data) {
-        <pre><code #codeEl [highlightAuto]="data" [languages]="[activeFile.language]"></code></pre>
-      }
-    }
-  }
-  
-  @if (gist && activeView() === 'preview') {
-    <div class="preview-container">
-      <preview-renderer [gist]="gist"></preview-renderer>
+
+      @if (activeView() === 1) {
+        <div class="preview-container">
+          <preview-renderer [gist]="gist"></preview-renderer>
+        </div>
+      } 
     </div>
   }
-</div>
+
+} @placeholder {
+  <div class="absolute flex h-12 w-full justify-center inset-0 text-gray-400">
+    <div class="flex flex-col items-center text-lg">
+      <div class="w-8 h-8 fill-blue-600 text-gray-200 animate-spin">
+        <icons class="" name="spinner"></icons>
+      </div>
+      <span class="mt-2">Präsentation wird vorbereitet...</span>
+    </div>
+  </div>
+} @loading {
+  <div class="absolute flex h-12 w-full justify-center inset-0 text-gray-400">
+    <div class="flex flex-col items-center text-lg">
+      <div class="w-8 h-8 fill-blue-600 text-gray-200 animate-spin">
+        <icons class="" name="spinner"></icons>
+      </div>
+      <span class="mt-2">Daten werden geladen...</span>
+    </div>
+  </div>
+} @error {
+  <div class="absolute flex h-12 w-full justify-center inset-0 text-gray-400">
+    <div class="flex flex-col items-center text-lg">
+      <div class="w-8 h-8 mr-2">
+        <icons class="stroke-2 stroke-current" name="alert-triangle"></icons>
+      </div>
+      <span>Es kam zu einem unerwarteten Fehler!</span>
+    </div>
+  </div>
+}

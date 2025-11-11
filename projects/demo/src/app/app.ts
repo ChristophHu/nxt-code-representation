@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { CodeRepresentationComponent, gist } from '../../../ngx-code-representation/src/public-api';
+import { CodeRepresentationComponent, CodeRepresentationService, gist } from '../../../ngx-code-representation/src/public-api';
 import { file } from '../../../ngx-code-representation/src/lib/models/file.interface';
 
 @Component({
@@ -11,7 +11,9 @@ import { file } from '../../../ngx-code-representation/src/lib/models/file.inter
   styleUrl: './app.sass'
 })
 export class App {
-  protected readonly title = signal('demo');
+  constructor(private _codeRepresentationService: CodeRepresentationService) {
+    this._codeRepresentationService.setGist(this.gist)
+  }
   
   testCode = `function hello() {
   console.log('Hello World');

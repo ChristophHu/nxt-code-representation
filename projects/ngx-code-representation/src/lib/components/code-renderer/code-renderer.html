@@ -1,1 +1,4 @@
-<p>code-renderer works!</p>
+{{ file | json }}
+@if (file && file.code) {
+    <pre><code #codeEl [highlightAuto]="file.code" [languages]="[file.language]"></code></pre>
+}
