@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ElementRenderer } from './element-renderer';
+import { ElementRenderer } from './preview-renderer';
 
 describe('ElementRenderer', () => {
   let component: ElementRenderer;

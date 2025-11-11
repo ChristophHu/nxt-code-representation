@@ -1,13 +1,22 @@
 <div class="code-container">
   <div class="tabs-header">
-    @for (file of files; track file.filename; let i = $index) {
+    @if (gist) {
       <button 
         class="tab-button" 
-        [class.active]="activeTabIndex() === i"
-        (click)="selectTab(i)">
+        [class.active]="activeView() === 'preview'"
+        (click)="selectView('preview')">
+        Preview
+      </button>
+    }
+    @for (file of gist?.file; track file.filename; let i = $index) {
+      <button 
+        class="tab-button" 
+        [class.active]="activeTabIndex() === i && activeView() === 'code'"
+        (click)="selectTab(i); selectView('code')">
         {{ file.filename }}
       </button>
     }
+
     <button class="copy-button" (click)="copyToClipboard()" [title]="copied() ? 'Copied!' : 'Copy to clipboard'">
       @if (copied()) {
         <div class="h-6 w-6 text-dark">
@@ -20,12 +29,21 @@
       }
     </button>
   </div>
-  @if (activeFile && activeFile.code) {
-      <pre><code #codeEl [highlightAuto]="activeFile.code" [languages]="[activeFile.language]"></code></pre>
-  }
-  @if (activeFile && activeFile.filepath) {
-    @if (activeFile.filepath | codeFromUrl | async; as data) {
-      <pre><code #codeEl [highlightAuto]="data" [languages]="[activeFile.language]"></code></pre>
+  
+  @if (activeView() === 'code') {
+    @if (activeFile && activeFile.code) {
+        <pre><code #codeEl [highlightAuto]="activeFile.code" [languages]="[activeFile.language]"></code></pre>
     }
+    @if (activeFile && activeFile.filepath) {
+      @if (activeFile.filepath | codeFromUrl | async; as data) {
+        <pre><code #codeEl [highlightAuto]="data" [languages]="[activeFile.language]"></code></pre>
+      }
+    }
+  }
+  
+  @if (gist && activeView() === 'preview') {
+    <div class="preview-container">
+      <preview-renderer [gist]="gist"></preview-renderer>
+    </div>
   }
 </div>

@@ -1,16 +1,15 @@
 import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewInit, Renderer2, inject, OnDestroy } from '@angular/core'
 import { gist } from '../../models/gist.interface'
-// import { file } from '../../models/file.interface';
 
 @Component({
-  selector: 'element-renderer',
+  selector: 'preview-renderer',
   imports: [
 
   ],
-  templateUrl: './element-renderer.html',
-  styleUrl: './element-renderer.sass',
+  templateUrl: './preview-renderer.html',
+  styleUrls: ['./preview-renderer.sass'],
 })
-export class ElementRenderer implements OnInit, AfterViewInit, OnDestroy {
+export class PreviewRenderer implements OnInit, AfterViewInit, OnDestroy {
   @Input() gist: gist = {
     "name": "Placeholder Gist",
     "type": "Ülaceholder",
