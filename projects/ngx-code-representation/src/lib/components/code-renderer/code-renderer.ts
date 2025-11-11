@@ -33,6 +33,15 @@ export class CodeRenderer implements OnInit {
   }
   
   ngAfterViewInit(): void {
+    // Hide code element and fade out table
+
+    if (this.codeElementRef.nativeElement && this.codeElementRef.nativeElement.classList.contains('hljs-line-numbers')) {
+      this.codeElementRef.nativeElement.classList.remove('hljs-line-numbers')
+    }
+    const table = this.codeElementRef.nativeElement.querySelector('.hljs-ln') as HTMLElement
+    if (table) {
+      table.style.opacity = '0'
+    }
     setTimeout(() => {
       if (this.codeElementRef) {
         this.addLineNumbersManually(this.codeElementRef.nativeElement)
