@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ElementRenderer } from './preview-renderer';
+import { PreviewRenderer } from './preview-renderer';
 
-describe('ElementRenderer', () => {
-  let component: ElementRenderer;
-  let fixture: ComponentFixture<ElementRenderer>;
+describe('PreviewRenderer', () => {
+  let component: PreviewRenderer;
+  let fixture: ComponentFixture<PreviewRenderer>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ElementRenderer]
+      imports: [PreviewRenderer]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ElementRenderer);
+    fixture = TestBed.createComponent(PreviewRenderer);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
