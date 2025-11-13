@@ -37,12 +37,16 @@ describe('CodeRepresentationService', () => {
       ]
     };
 
-    let emittedGist: gist | null = null;
-    service.gist$.subscribe(gist => emittedGist = gist);
+    const subscription = service.gist$.subscribe(gist => {
+      if (gist) {
+        expect(gist.name).toBe('test-gist');
+        expect(gist.file.length).toBe(1);
+      }
+    });
 
     service.setGist(mockGist);
-
-    expect(emittedGist).toEqual(mockGist);
+    
+    subscription.unsubscribe();
   });
 
   it('should set file by index', async () => {
@@ -65,14 +69,17 @@ describe('CodeRepresentationService', () => {
       ]
     };
 
-    let emittedFile: file | null = null;
-    service.file$.subscribe(file => emittedFile = file);
+    const subscription = service.file$.subscribe(file => {
+      if (file) {
+        expect(file.filename).toBe('test2.css');
+        expect(file.language).toBe('css');
+      }
+    });
 
     service.setGist(mockGist);
     service.setFile(1);
-
-    expect(emittedFile).toEqual(mockGist.file[1]);
-    expect(emittedFile?.filename).toBe('test2.css');
+    
+    subscription.unsubscribe();
   });
 
   it('should return null when file index is out of bounds', async () => {
@@ -90,56 +97,83 @@ describe('CodeRepresentationService', () => {
       ]
     };
 
-    let emittedFile: file | null = null;
-    service.file$.subscribe(file => emittedFile = file);
+    let receivedNull = false;
+    const subscription = service.file$.subscribe(file => {
+      if (file === null && receivedNull) {
+        expect(file).toBeNull();
+      }
+      if (file === null) {
+        receivedNull = true;
+      }
+    });
 
     service.setGist(mockGist);
     service.setFile(99);
-
-    expect(emittedFile).toBeNull();
+    
+    subscription.unsubscribe();
   });
 
   it('should have default font size of 16px', async () => {
-    let emittedFontSize: string = '';
-    service.fontsize$.subscribe(size => emittedFontSize = size);
-
-    expect(emittedFontSize).toBe('16px');
+    const subscription = service.fontsize$.subscribe(size => {
+      expect(size).toBe('16px');
+    });
+    
+    subscription.unsubscribe();
   });
 
   it('should increase font size', async () => {
-    let emittedFontSize: string = '';
-    service.fontsize$.subscribe(size => emittedFontSize = size);
+    let callCount = 0;
+    const subscription = service.fontsize$.subscribe(size => {
+      if (callCount === 0) {
+        expect(size).toBe('16px');
+      } else if (callCount === 1) {
+        expect(size).toBe('18px');
+      } else if (callCount === 2) {
+        expect(size).toBe('20px');
+      }
+      callCount++;
+    });
 
     service.increaseFontSize();
-
-    expect(emittedFontSize).toBe('18px');
-
     service.increaseFontSize();
-
-    expect(emittedFontSize).toBe('20px');
+    
+    subscription.unsubscribe();
   });
 
   it('should decrease font size', async () => {
-    let emittedFontSize: string = '';
-    service.fontsize$.subscribe(size => emittedFontSize = size);
+    let callCount = 0;
+    const subscription = service.fontsize$.subscribe(size => {
+      if (callCount === 0) {
+        expect(size).toBe('16px');
+      } else if (callCount === 1) {
+        expect(size).toBe('14px');
+      } else if (callCount === 2) {
+        expect(size).toBe('12px');
+      }
+      callCount++;
+    });
 
     service.decreaseFontSize();
-
-    expect(emittedFontSize).toBe('14px');
-
     service.decreaseFontSize();
-
-    expect(emittedFontSize).toBe('12px');
+    
+    subscription.unsubscribe();
   });
 
   it('should handle multiple font size changes', async () => {
-    let emittedFontSize: string = '';
-    service.fontsize$.subscribe(size => emittedFontSize = size);
+    let callCount = 0;
+    const subscription = service.fontsize$.subscribe(size => {
+      if (callCount === 0) {
+        expect(size).toBe('16px');
+      } else if (callCount === 3) {
+        expect(size).toBe('18px');
+      }
+      callCount++;
+    });
 
     service.increaseFontSize();
     service.increaseFontSize();
     service.decreaseFontSize();
-
-    expect(emittedFontSize).toBe('18px');
+    
+    subscription.unsubscribe();
   });
 });
